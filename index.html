@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0D2B4A">
+  <title>무구의 초대장을 완성하라! — 남도영화제 시즌3</title>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+    :root {
+      --font-ui: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --brand: #0D2B4A;
+      --mint: #CFE6E8;
+      --mint-deep: #A3D7D8;
+      --surface: #F4FAFA;
+      --ink: #0D2B4A;
+      --body: #2A3F52;
+      --muted: #6B8296;
+      --line: #D5E8EA;
+      --white: #ffffff;
+      --ok: #1F7A6B;
+      --bad: #C45C4A;
+      --pill: 9999px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes softPop {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background: var(--mint);
+      color: var(--body);
+      min-height: 100vh;
+      touch-action: manipulation;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .site-head {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+      padding: 0 16px;
+      background: rgba(244, 250, 250, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+    .site-head__brand {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--brand);
+      letter-spacing: -0.02em;
+    }
+    .site-head__actions { display: flex; gap: 8px; align-items: center; }
+    .icon-btn {
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--brand);
+      border-radius: var(--pill);
+      min-height: 36px;
+      padding: 0 12px;
+      font-size: 0.75rem;
+      font-family: var(--font-ui);
+      cursor: pointer;
+    }
+
+    .progress-line { height: 3px; background: #E2F0F1; }
+    .progress-line__fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--mint-deep), var(--brand));
+      transition: width 0.4s ease;
+    }
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 16px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      animation: fadeInUp 0.45s ease both;
+    }
+
+    .hero-logo {
+      padding: 28px 24px 8px;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(163, 215, 216, 0.55), transparent 60%),
+        var(--surface);
+    }
+    .hero-logo img {
+      width: min(92%, 360px);
+      height: auto;
+    }
+
+    /* 1·5: 전체 포스터/영상 타이틀 */
+    .title-hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .title-hero__media {
+      flex: 1;
+      min-height: 52vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      background: var(--brand);
+      overflow: hidden;
+    }
+    .title-hero__media img,
+    .title-hero__media video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .title-hero__cta {
+      padding: 16px 20px 28px;
+      background: var(--surface);
+    }
+    .typewriter-target.is-typing::after {
+      content: "▋";
+      margin-left: 2px;
+      color: var(--brand);
+      animation: caretBlink 0.8s steps(1) infinite;
+    }
+    @keyframes caretBlink {
+      50% { opacity: 0; }
+    }
+
+    .moogu-stage {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      min-height: 220px;
+      padding: 8px 16px 0;
+      background:
+        radial-gradient(circle at 50% 80%, rgba(207, 230, 232, 0.9), transparent 55%);
+    }
+    .moogu-stage img {
+      width: min(62vw, 260px);
+      height: auto;
+    }
+    .moogu-stage img.is-pop {
+      animation: softPop 0.4s ease both;
+    }
+
+    .block { padding: 16px 20px 28px; }
+    .display-xl {
+      font-size: clamp(1.35rem, 5.2vw, 1.7rem);
+      color: var(--brand);
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+    .display-sub {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .body-text {
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      margin-bottom: 12px;
+      color: var(--body);
+    }
+
+    .voice-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 8px 0 4px;
+    }
+    .voice-line {
+      margin: 0;
+      padding: 14px 16px;
+      background: var(--white);
+      border-left: 3px solid var(--brand);
+      border-radius: 0 12px 12px 0;
+      opacity: 0;
+    }
+    .voice-line.is-enter {
+      animation: fadeInUp 0.45s ease both;
+    }
+    .voice-line.is-shown {
+      opacity: 1;
+    }
+    .voice-line__who {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--brand);
+      margin-bottom: 6px;
+    }
+    .voice-line__text {
+      font-size: 0.9375rem;
+      line-height: 1.65;
+      color: var(--ink);
+      white-space: pre-wrap;
+    }
+
+    .prompt-box {
+      margin: 14px 0;
+      padding: 14px 16px;
+      background: var(--mint);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--brand);
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+
+    .fact-line {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: #EAF6F6;
+      border-radius: 8px;
+      font-size: 0.8125rem;
+      color: var(--ok);
+      line-height: 1.55;
+    }
+
+    .btn-row { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: var(--pill);
+      font-family: var(--font-ui);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn--primary { background: var(--brand); color: var(--white); }
+    .btn--ghost {
+      background: var(--white);
+      color: var(--brand);
+      border: 1px solid var(--line);
+    }
+    .btn--choice {
+      width: 100%;
+      text-align: left;
+      justify-content: flex-start;
+      background: var(--white);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-weight: 500;
+    }
+    .btn--choice.is-active {
+      border-color: var(--brand);
+      background: #EAF3F6;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 12px 0;
+    }
+    .field label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--brand);
+    }
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-family: var(--font-ui);
+      font-size: 1rem;
+      background: var(--white);
+      color: var(--ink);
+    }
+    .field textarea { min-height: 72px; resize: vertical; }
+    .dual-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 8px;
+      align-items: end;
+    }
+    .dual-row .sep {
+      padding-bottom: 14px;
+      color: var(--brand);
+      font-weight: 700;
+    }
+
+    .feedback {
+      min-height: 1.4em;
+      margin-top: 8px;
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+    .feedback.ok { color: var(--ok); }
+    .feedback.fail { color: var(--bad); }
+
+    .invite-card {
+      margin-top: 12px;
+      padding: 20px 18px;
+      border-radius: 16px;
+      background:
+        linear-gradient(160deg, #F7FCFC 0%, var(--mint) 100%);
+      border: 1px solid var(--line);
+      text-align: center;
+    }
+    .invite-card__logo {
+      width: min(80%, 280px);
+      margin: 0 auto 14px;
+      display: block;
+    }
+    .invite-card__title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--brand);
+      margin-bottom: 10px;
+    }
+    .invite-card__line {
+      font-size: 0.875rem;
+      line-height: 1.7;
+      color: var(--body);
+    }
+    .invite-card__guest {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--mint-deep);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--brand);
+    }
+    .goods-banner {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 12px;
+      background: var(--brand);
+      color: var(--white);
+      font-size: 0.875rem;
+      line-height: 1.55;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .journal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(13, 43, 74, 0.45);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .journal-sheet {
+      width: 100%;
+      max-width: 480px;
+      max-height: 72vh;
+      overflow-y: auto;
+      background: var(--white);
+      border-radius: 16px 16px 0 0;
+      padding: 20px;
+    }
+    .journal-item {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.8125rem;
+      line-height: 1.55;
+    }
+
+    .app-foot {
+      padding: 20px;
+      text-align: center;
+      font-size: 0.6875rem;
+      color: var(--muted);
+    }
+
+    .boot-loading {
+      padding: 56px 24px 40px;
+      text-align: center;
+    }
+    .boot-loading__spin {
+      width: 36px;
+      height: 36px;
+      margin: 0 auto 20px;
+      border: 3px solid var(--line);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: bootSpin 0.75s linear infinite;
+    }
+    @keyframes bootSpin {
+      to { transform: rotate(360deg); }
+    }
+    .boot-pct-box {
+      position: relative;
+      margin: 20px auto 0;
+      max-width: 240px;
+      height: 56px;
+      border: 2px solid var(--brand);
+      border-radius: 12px;
+      background: var(--white);
+      overflow: hidden;
+    }
+    .boot-pct-box__fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 0%;
+      background: linear-gradient(90deg, var(--mint-deep), #7EB8C0);
+      transition: width 0.25s ease;
+    }
+    .boot-pct-box__label {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--brand);
+      letter-spacing: 0.02em;
+    }
+
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="site-head">
+      <span class="site-head__brand">남도영화제 · 시즌3</span>
+      <div class="site-head__actions">
+        <button type="button" class="icon-btn" id="btn-home">처음으로</button>
+        <button type="button" class="icon-btn" id="btn-bgm">BGM</button>
+        <button type="button" class="icon-btn" id="btn-journal" hidden>초대장</button>
+      </div>
+    </header>
+    <div class="progress-line"><div class="progress-line__fill" id="progress-fill"></div></div>
+    <div class="progress-meta">
+      <span id="progress-label">초대장 0/4</span>
+      <span>무구와 함께</span>
+    </div>
+    <div class="moogu-stage" id="moogu-stage" hidden>
+      <img id="moogu-img" alt="무구" width="260" height="260">
+    </div>
+    <main id="main" class="stage">
+      <section class="boot-loading" id="boot-loading">
+        <div class="boot-loading__spin" aria-hidden="true"></div>
+        <h1 class="display-xl">무구가 준비하는 중</h1>
+        <p class="display-sub" id="boot-status">이미지·BGM을 불러오고 있어요</p>
+        <div class="boot-pct-box" id="boot-pct-box" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="boot-pct-box__fill" id="boot-pct-fill" style="width:0%"></div>
+          <div class="boot-pct-box__label" id="boot-pct">0%</div>
+        </div>
+        <p class="feedback" id="boot-detail" style="margin-top:10px">준비 중…</p>
+      </section>
+    </main>
+    <footer class="app-foot">남도영화제 시즌3 장흥 프레 · 2026.10.16–17 · 빠삐용Zip</footer>
+  </div>
+  <audio id="bgm" loop preload="none"></audio>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
