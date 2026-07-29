@@ -418,16 +418,30 @@ function bindStartButton() {
   };
 }
 
+function startTitleTypewriters() {
+  runTypewriter(document.getElementById("title-main"), DOC.meta.title, 48);
+  setTimeout(() => {
+    runTypewriter(document.getElementById("title-sub"), DOC.meta.subtitle, 28);
+  }, DOC.meta.title.length * 48 + 120);
+  setTimeout(() => {
+    runTypewriter(document.getElementById("title-body"), DOC.meta.centralQuestion, 24);
+  }, DOC.meta.title.length * 48 + DOC.meta.subtitle.length * 28 + 280);
+}
+
 function showTitleMedia(mediaHtml) {
   $main.innerHTML = `
     <section class="title-hero">
       <div class="title-hero__media">${mediaHtml}</div>
-      <div class="title-hero__cta">
-        <div class="btn-row" style="margin-top:0">
+      <div class="title-hero__cta block" style="padding-top:16px">
+        <h1 class="display-xl typewriter-target" id="title-main"></h1>
+        <p class="display-sub typewriter-target" id="title-sub"></p>
+        <p class="body-text typewriter-target" id="title-body"></p>
+        <div class="btn-row">
           <button type="button" class="btn btn--primary" id="btn-start">시작하기</button>
         </div>
       </div>
     </section>`;
+  startTitleTypewriters();
   bindStartButton();
 }
 
@@ -446,14 +460,7 @@ function showTitleText() {
       </div>
     </section>`;
 
-  runTypewriter(document.getElementById("title-main"), DOC.meta.title, 48);
-  setTimeout(() => {
-    runTypewriter(document.getElementById("title-sub"), DOC.meta.subtitle, 28);
-  }, DOC.meta.title.length * 48 + 120);
-  setTimeout(() => {
-    runTypewriter(document.getElementById("title-body"), DOC.meta.centralQuestion, 24);
-  }, DOC.meta.title.length * 48 + DOC.meta.subtitle.length * 28 + 280);
-
+  startTitleTypewriters();
   bindStartButton();
 }
 
@@ -461,7 +468,6 @@ async function showTitle() {
   state.currentMissionId = null;
   hideMoogu();
 
-  // 1·5: 제공 영상/포스터가 있으면 전체 비주얼 + 시작 버튼만
   const videoUrl = await probeAsset("fi/hero-intro.mp4");
   if (videoUrl) {
     showTitleMedia(`
@@ -471,7 +477,7 @@ async function showTitle() {
     return;
   }
   const posterUrl =
-    (await probeAsset("fi/hero-poster.png")) || (await probeAsset("fi/hero-poster.jpg"));
+    (await probeAsset("fi/hero-poster.jpg")) || (await probeAsset("fi/hero-poster.png"));
   if (posterUrl) {
     showTitleMedia(
       `<img id="hero-poster-img" alt="남도영화제 시즌3 장흥 프레" src="${posterUrl}">`
@@ -479,7 +485,6 @@ async function showTitle() {
     return;
   }
 
-  // 포스터 없을 때: 타자기 문구 (무구 대사 없음)
   showTitleText();
 }
 
@@ -866,8 +871,7 @@ function renderSurvey(m) {
     };
 
     if (!SURVEY_WEBAPP_URL || SURVEY_WEBAPP_URL.indexOf("PASTE_") === 0) {
-      console.warn("SURVEY_WEBAPP_URL 미설정 — 로컬만 저장");
-      finishLocal();
+      fail("config.js에 Apps Script 웹앱 URL이 아직 없어요");
       return;
     }
 
@@ -922,6 +926,14 @@ function completeMission(m, fromSurvey) {
 
 function showEnding() {
   const s = state.survey || {};
+  const followUrl = String(window.FOLLOW_URL || "https://litt.ly/ndff_official").trim();
+  try {
+    localStorage.setItem(
+      "ndff3pre-ending",
+      JSON.stringify({ survey: s, at: Date.now() })
+    );
+  } catch (_) {}
+
   setMoogu("10");
   $main.innerHTML = `
     <section class="block">
@@ -936,8 +948,21 @@ function showEnding() {
         <p class="invite-card__guest">${s.name ? `${s.name} 님께` : "당신께"}</p>
         ${s.expect ? `<p class="invite-card__line">기대 · ${s.expect}</p>` : ""}
       </div>
-      <div class="goods-banner">굿즈 수령 — 이 페이지를 보여주시고<br>굿즈를 수령해 주세요!</div>
-      ${factBox("초대장의 세 빈칸과 주인공이 모두 채워졌습니다.")}
+
+      <div class="follow-guide">
+        <p class="follow-guide__title">굿즈 받는 방법</p>
+        <ol class="follow-guide__steps">
+          <li>아래 버튼으로 공식 페이지에 들어가 <strong>아무거나 하나 팔로우</strong>해요.</li>
+          <li><strong>팔로우한 화면</strong>을 부스 직원에게 보여 주세요.</li>
+          <li>확인되면 굿즈를 받을 수 있어요!</li>
+        </ol>
+        <div class="btn-row" style="margin-top:14px">
+          <a class="btn btn--primary" id="btn-follow" href="${followUrl}" target="_blank" rel="noopener noreferrer">팔로우하러 가기</a>
+        </div>
+        <p class="follow-guide__hint">새 탭으로 열려요. 팔로우 화면을 직원에게 보여 준 뒤,<br>이 탭으로 돌아와도 괜찮아요.</p>
+      </div>
+
+      <div class="goods-banner">직원에게 팔로우 화면을 보여 주세요</div>
       <div class="btn-row">
         <button type="button" class="btn btn--ghost" id="btn-restart">다시 하기</button>
       </div>

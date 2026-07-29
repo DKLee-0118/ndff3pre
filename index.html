@@ -119,28 +119,24 @@
       height: auto;
     }
 
-    /* 1·5: 전체 포스터/영상 타이틀 */
+    /* 첫 화면 포스터/영상 — 좌우 흰 여백으로 살짝 축소 */
     .title-hero {
-      flex: 1;
       display: flex;
       flex-direction: column;
-      min-height: 0;
     }
     .title-hero__media {
-      flex: 1;
-      min-height: 52vh;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-      background: var(--brand);
-      overflow: hidden;
+      display: block;
+      line-height: 0;
+      background: var(--surface);
+      padding: 0 18px;
     }
     .title-hero__media img,
     .title-hero__media video {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
       display: block;
+      vertical-align: top;
+      border-radius: 4px;
     }
     .title-hero__cta {
       padding: 16px 20px 28px;
@@ -373,6 +369,38 @@
       line-height: 1.55;
       text-align: center;
       font-weight: 600;
+    }
+
+    .follow-guide {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 12px;
+      background: var(--white);
+      border: 1px solid var(--line);
+    }
+    .follow-guide__title {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--brand);
+      margin-bottom: 10px;
+    }
+    .follow-guide__steps {
+      margin: 0;
+      padding-left: 1.2em;
+      font-size: 0.875rem;
+      line-height: 1.65;
+      color: var(--body);
+    }
+    .follow-guide__steps li + li { margin-top: 6px; }
+    .follow-guide__hint {
+      margin-top: 12px;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      color: var(--muted);
+      text-align: center;
+    }
+    a.btn {
+      text-decoration: none;
     }
 
     .journal-overlay {

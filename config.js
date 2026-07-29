@@ -10,5 +10,8 @@
 window.SURVEY_WEBAPP_URL =
   "https://script.google.com/macros/s/AKfycbxkVIGjYJX-u7Z073zdPu6m-ehVJxd2PUhwX46nUeaKtHREXWCR_w3mR3U7Smd10NsL/exec";
 
+/** 굿즈용 팔로우 링크 (litt.ly) */
+window.FOLLOW_URL = "https://litt.ly/ndff_official";
+
 /** 에셋 폴더 (보통 수정 불필요) */
 window.ASSET_BASE = "assets/";
