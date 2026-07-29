@@ -810,6 +810,28 @@ function renderSurvey(m) {
             </div>`;
           })
           .join("")}
+        <div class="privacy-box">
+          <p class="privacy-box__title">개인정보 수집 및 이용 동의</p>
+          <p class="privacy-box__note">동의하지 않을 경우, 설문 참여가 어려운 점 양해 부탁드립니다.</p>
+          <dl class="privacy-box__dl">
+            <div>
+              <dt>수집·이용 항목</dt>
+              <dd>이름, 이메일, 사는 곳</dd>
+            </div>
+            <div>
+              <dt>수집·이용 목적</dt>
+              <dd>이벤트 진행 및 남도영화제 소식 전달</dd>
+            </div>
+            <div>
+              <dt>보유·이용기간</dt>
+              <dd>남도영화제 이벤트 진행 및 10월 프레 행사 이후 1개월</dd>
+            </div>
+          </dl>
+          <label class="privacy-check">
+            <input type="checkbox" id="privacy-agree" name="privacyAgree">
+            <span>위 개인정보 수집 및 이용에 동의합니다. (필수)</span>
+          </label>
+        </div>
         <p class="feedback" id="fb"></p>
         <div class="btn-row">
           <button type="submit" class="btn btn--primary" id="btn-survey-submit">초대장 완성하기</button>
@@ -830,6 +852,14 @@ function renderSurvey(m) {
     e.preventDefault();
     if (state.submitting) return;
 
+    const agree = document.getElementById("privacy-agree");
+    if (!agree || !agree.checked) {
+      const fb = document.getElementById("fb");
+      fb.className = "feedback fail";
+      fb.textContent = "개인정보 수집 및 이용에 동의해 주세요!";
+      return;
+    }
+
     const data = {};
     for (const f of fields) {
       const el = document.getElementById(`field-${f.id}`);
@@ -842,6 +872,7 @@ function renderSurvey(m) {
       }
       data[f.id] = val;
     }
+    data.privacyAgree = true;
     // 한국 시간 (클라이언트) — 서버에서도 재확인
     data.submittedAt = new Date().toLocaleString("sv-SE", { timeZone: "Asia/Seoul" });
 

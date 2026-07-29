@@ -326,6 +326,63 @@
     .feedback.ok { color: var(--ok); }
     .feedback.fail { color: var(--bad); }
 
+    .privacy-box {
+      margin: 16px 0 8px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--white);
+    }
+    .privacy-box__title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--brand);
+      margin-bottom: 6px;
+    }
+    .privacy-box__note {
+      font-size: 0.75rem;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .privacy-box__dl {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 0 0 14px;
+    }
+    .privacy-box__dl div {
+      display: grid;
+      gap: 2px;
+    }
+    .privacy-box__dl dt {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: var(--brand);
+    }
+    .privacy-box__dl dd {
+      margin: 0;
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      color: var(--body);
+    }
+    .privacy-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.8125rem;
+      line-height: 1.45;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .privacy-check input {
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+      flex-shrink: 0;
+      accent-color: var(--brand);
+    }
+
     .invite-card {
       margin-top: 12px;
       padding: 20px 18px;
