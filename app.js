@@ -970,7 +970,7 @@ function showEnding() {
     <section class="block">
       <h2 class="display-xl">짜잔! 초대장 완성!!</h2>
       ${voice(DOC.missions.find((x) => x.id === "m5").storyBridge.after)}
-      <div class="invite-card">
+      <div class="invite-card" id="invite-card">
         <img class="invite-card__logo" id="invite-logo" alt="남도영화제 날짜" hidden>
         <p class="invite-card__title">남도영화제 시즌3 장흥 프레</p>
         <p class="invite-card__line">개최지 · 장흥</p>
@@ -978,6 +978,9 @@ function showEnding() {
         <p class="invite-card__line">장소 · 빠삐용Zip (옛장흥교도소)</p>
         <p class="invite-card__guest">${s.name ? `${s.name} 님께` : "당신께"}</p>
         ${s.expect ? `<p class="invite-card__line">기대 · ${s.expect}</p>` : ""}
+      </div>
+      <div class="btn-row" style="margin-top:12px">
+        <button type="button" class="btn btn--ghost" id="btn-save-invite">초대장 이미지로 저장</button>
       </div>
 
       <div class="follow-guide">
@@ -1005,7 +1008,103 @@ function showEnding() {
       inviteLogo.hidden = false;
     }
   });
+  document.getElementById("btn-save-invite").onclick = () => saveInviteCardImage();
   document.getElementById("btn-restart").onclick = resetToTitle;
+}
+
+function loadHtml2Canvas_(done) {
+  if (window.html2canvas) {
+    done(window.html2canvas);
+    return;
+  }
+  const existing = document.getElementById("html2canvas-cdn");
+  if (existing) {
+    existing.addEventListener("load", () => done(window.html2canvas));
+    existing.addEventListener("error", () => done(null));
+    return;
+  }
+  const script = document.createElement("script");
+  script.id = "html2canvas-cdn";
+  script.src = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
+  script.onload = () => done(window.html2canvas || null);
+  script.onerror = () => done(null);
+  document.head.appendChild(script);
+}
+
+function saveInviteCardImage() {
+  const card = document.getElementById("invite-card");
+  const btn = document.getElementById("btn-save-invite");
+  if (!card || !btn) return;
+
+  const prev = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "이미지 만드는 중…";
+
+  const finishBtn = () => {
+    btn.disabled = false;
+    btn.textContent = prev;
+  };
+
+  loadHtml2Canvas_((html2canvas) => {
+    if (!html2canvas) {
+      alert("이미지 저장 기능을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.");
+      finishBtn();
+      return;
+    }
+
+    html2canvas(card, {
+      backgroundColor: "#F4FAFA",
+      scale: Math.min(3, window.devicePixelRatio || 2),
+      useCORS: true,
+      logging: false
+    })
+      .then((canvas) =>
+        new Promise((resolve, reject) => {
+          canvas.toBlob((blob) => {
+            if (!blob) reject(new Error("blob 생성 실패"));
+            else resolve(blob);
+          }, "image/png");
+        })
+      )
+      .then(async (blob) => {
+        const fileName = "남도영화제-초대장.png";
+        const file = new File([blob], fileName, { type: "image/png" });
+
+        // 모바일: 공유 시트로 저장/공유가 더 안정적
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: "남도영화제 초대장",
+              text: "무구의 초대장"
+            });
+            finishBtn();
+            return;
+          } catch (err) {
+            if (err && err.name === "AbortError") {
+              finishBtn();
+              return;
+            }
+          }
+        }
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        a.rel = "noopener";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        finishBtn();
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("초대장 이미지 저장에 실패했어요. 다시 눌러 주세요.");
+        finishBtn();
+      });
+  });
 }
 
 function openJournal() {
