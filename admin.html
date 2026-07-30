@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="robots" content="noindex,nofollow">
+  <title>관리자 — 남도영화제 시즌3</title>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+    :root {
+      --brand: #0D2B4A;
+      --mint: #CFE6E8;
+      --surface: #F4FAFA;
+      --line: #D5E8EA;
+      --muted: #6B8296;
+      --white: #fff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: var(--mint);
+      color: var(--brand);
+      min-height: 100vh;
+    }
+    .wrap {
+      max-width: 420px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--surface);
+      padding: 28px 20px 40px;
+    }
+    h1 {
+      font-size: 1.25rem;
+      margin-bottom: 6px;
+    }
+    .sub {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 48px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 9999px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn--primary { background: var(--brand); color: #fff; }
+    .btn--ghost {
+      background: var(--white);
+      color: var(--brand);
+      border: 1px solid var(--line);
+    }
+    .err {
+      margin-top: 10px;
+      font-size: 0.8125rem;
+      color: #C45C4A;
+      min-height: 1.2em;
+    }
+    .grid { display: grid; gap: 8px; }
+    .hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>관리자 테스트</h1>
+    <p class="sub">게임 전체를 안 돌리고 원하는 화면으로 바로 이동합니다.</p>
+
+    <section class="card" id="gate">
+      <label for="pin">비밀번호</label>
+      <input id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="숫자 입력" autocomplete="off">
+      <button type="button" class="btn btn--primary" id="btn-login">입장</button>
+      <p class="err" id="err"></p>
+    </section>
+
+    <section class="card" id="panel" hidden>
+      <p class="sub" style="margin-bottom:12px">이동할 화면을 고르세요.</p>
+      <div class="grid">
+        <button type="button" class="btn btn--ghost" data-jump="title">타이틀(첫 화면)</button>
+        <button type="button" class="btn btn--ghost" data-jump="m1">인트로 대화 (m1)</button>
+        <button type="button" class="btn btn--ghost" data-jump="m2">미션1 개최지 (m2)</button>
+        <button type="button" class="btn btn--ghost" data-jump="m3">미션2 날짜 (m3)</button>
+        <button type="button" class="btn btn--ghost" data-jump="m4">미션3 장소 (m4)</button>
+        <button type="button" class="btn btn--ghost" data-jump="survey">설문 (m5)</button>
+        <button type="button" class="btn btn--primary" data-jump="ending">엔딩(초대장+팔로우)</button>
+      </div>
+      <p class="hint">엔딩으로 가면 테스트용 설문 데이터(이름: 테스트)가 자동으로 들어갑니다.</p>
+      <button type="button" class="btn btn--ghost" id="btn-logout" style="margin-top:16px">잠금</button>
+      <a class="btn btn--ghost" href="./" style="margin-top:8px;text-decoration:none">일반 게임으로</a>
+    </section>
+  </div>
+
+  <script>
+    const ADMIN_PIN = "9410";
+    const AUTH_KEY = "ndff3pre-admin-auth";
+    const JUMP_KEY = "ndff3pre-admin-jump";
+
+    const $gate = document.getElementById("gate");
+    const $panel = document.getElementById("panel");
+    const $pin = document.getElementById("pin");
+    const $err = document.getElementById("err");
+
+    function showPanel() {
+      $gate.hidden = true;
+      $panel.hidden = false;
+    }
+
+    function showGate() {
+      $panel.hidden = true;
+      $gate.hidden = false;
+      $pin.value = "";
+      $err.textContent = "";
+    }
+
+    if (sessionStorage.getItem(AUTH_KEY) === "1") showPanel();
+
+    document.getElementById("btn-login").onclick = () => {
+      if (String($pin.value || "").trim() === ADMIN_PIN) {
+        sessionStorage.setItem(AUTH_KEY, "1");
+        showPanel();
+      } else {
+        $err.textContent = "비밀번호가 틀렸어요.";
+      }
+    };
+
+    $pin.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") document.getElementById("btn-login").click();
+    });
+
+    document.getElementById("btn-logout").onclick = () => {
+      sessionStorage.removeItem(AUTH_KEY);
+      sessionStorage.removeItem(JUMP_KEY);
+      showGate();
+    };
+
+    document.querySelectorAll("[data-jump]").forEach((btn) => {
+      btn.onclick = () => {
+        sessionStorage.setItem(JUMP_KEY, btn.dataset.jump);
+        location.href = "./";
+      };
+    });
+  </script>
+</body>
+</html>

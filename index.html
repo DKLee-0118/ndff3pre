@@ -560,10 +560,38 @@
     }
 
     .app-foot {
-      padding: 20px;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 16px 20px 20px;
       font-size: 0.6875rem;
       color: var(--muted);
+    }
+    .app-foot__text {
+      flex: 1;
+      min-width: 0;
+      line-height: 1.4;
+    }
+    .app-foot__admin {
+      flex-shrink: 0;
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--muted);
+      font-family: var(--font-ui);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      opacity: 1;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 9999px;
+      text-decoration: none;
+      line-height: 1.2;
+    }
+    .app-foot__admin:hover,
+    .app-foot__admin:focus {
+      color: var(--brand);
+      border-color: var(--brand);
     }
 
     .boot-loading {
@@ -645,7 +673,10 @@
         <p class="feedback" id="boot-detail" style="margin-top:10px">준비 중…</p>
       </section>
     </main>
-    <footer class="app-foot">남도영화제 시즌3 장흥 프레 · 2026.10.16–17 · 빠삐용Zip</footer>
+    <footer class="app-foot">
+      <span class="app-foot__text">남도영화제 시즌3 장흥 프레 · 2026.10.16–17 · 빠삐용Zip</span>
+      <a class="app-foot__admin" href="admin.html" title="관리자">관리</a>
+    </footer>
   </div>
   <audio id="bgm" loop preload="none"></audio>
   <script src="config.js"></script>

@@ -571,7 +571,10 @@ function bootPreloadThenStart() {
     warmAssetsInBackground();
     $fill.style.width = "0%";
     updateProgress();
-    setTimeout(() => showTitle(), 120);
+    setTimeout(() => {
+      if (applyAdminJump_()) return;
+      showTitle();
+    }, 120);
   };
 
   critical.forEach((path) => {
@@ -586,6 +589,95 @@ function bootPreloadThenStart() {
     img.onerror = onOne;
     img.src = assetUrl(path);
   });
+}
+
+function applyAdminJump_() {
+  let jump = "";
+  try {
+    jump = String(sessionStorage.getItem("ndff3pre-admin-jump") || "").trim();
+    if (jump) sessionStorage.removeItem("ndff3pre-admin-jump");
+  } catch (_) {
+    return false;
+  }
+  if (!jump) return false;
+
+  // 테스트용 기본 설문
+  const demoSurvey = {
+    name: "테스트",
+    email: "test@ndff.local",
+    home: "장흥군",
+    wantFilm: "남도의 풍경",
+    expect: "야외 영화 상영",
+    privacyAgree: true,
+    submittedAt: new Date().toLocaleString("sv-SE", { timeZone: "Asia/Seoul" })
+  };
+
+  const unlockUntil = {
+    title: [],
+    m1: ["info:start"],
+    m2: ["info:start", "info:ndff_tour"],
+    m3: ["info:start", "info:ndff_tour", "info:host_jangheung"],
+    m4: ["info:start", "info:ndff_tour", "info:host_jangheung", "info:date_pre"],
+    survey: [
+      "info:start",
+      "info:ndff_tour",
+      "info:host_jangheung",
+      "info:date_pre",
+      "info:place_papillon"
+    ],
+    ending: [
+      "info:start",
+      "info:ndff_tour",
+      "info:host_jangheung",
+      "info:date_pre",
+      "info:place_papillon",
+      "info:guest_profile",
+      "info:invite_complete"
+    ]
+  };
+
+  const know = unlockUntil[jump];
+  if (!know) return false;
+
+  state.knowledge = new Set(know.length ? know : ["info:start"]);
+  state.completed = new Set();
+  state.hintLevel = {};
+  state.survey = null;
+  state.currentMissionId = null;
+  state.submitting = false;
+  updateProgress();
+
+  if (jump === "title") {
+    showTitle();
+    return true;
+  }
+  if (jump === "m1") {
+    startMission(missionById("m1"));
+    return true;
+  }
+  if (jump === "m2") {
+    startMission(missionById("m2"));
+    return true;
+  }
+  if (jump === "m3") {
+    startMission(missionById("m3"));
+    return true;
+  }
+  if (jump === "m4") {
+    startMission(missionById("m4"));
+    return true;
+  }
+  if (jump === "survey") {
+    startMission(missionById("m5"));
+    return true;
+  }
+  if (jump === "ending") {
+    state.survey = demoSurvey;
+    state.completed.add("m5");
+    showEnding();
+    return true;
+  }
+  return false;
 }
 
 function startMission(m) {
