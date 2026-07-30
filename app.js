@@ -147,7 +147,9 @@ const DOC = {
         mooguOk: "10",
         mooguWrong: "06",
         prompt: "프레 행사 장소는? (옛장흥교도소)",
-        answerAccept: ["빠삐용Zip", "빠삐용집", "빠삐용ZIP", "빠삐용zip", "빠삐용"],
+        mode: "choice",
+        choices: ["장흥문화예술회관", "탐진강 수변공원", "빠삐용Zip", "동학농민혁명기념관"],
+        answerAccept: ["빠삐용Zip"],
         wrongReaction: "거긴 아닌 것같아! 이름이 좀 특이한 그곳…",
         hintLadder: [
           "옛장흥교도소가 바뀐 이름이야.",
@@ -176,7 +178,8 @@ const DOC = {
         survey: {
           fields: [
             { id: "name", label: "이름", required: true },
-            { id: "email", label: "이메일 (제일 먼저 소식을 들려주고 싶어서!)", required: true, type: "email" },
+            { id: "email", label: "이메일 (전화번호와 둘 중 하나 필수)", required: false, type: "email" },
+            { id: "phone", label: "전화번호 (이메일과 둘 중 하나 필수)", required: false, type: "tel" },
             { id: "home", label: "사는 곳 (OO시, OO군까지만)", required: true },
             { id: "wantFilm", label: "남도영화제에서 보고 싶은 영화", required: false },
             {
@@ -605,6 +608,7 @@ function applyAdminJump_() {
   const demoSurvey = {
     name: "테스트",
     email: "test@ndff.local",
+    phone: "010-1234-5678",
     home: "장흥군",
     wantFilm: "남도의 풍경",
     expect: "야외 영화 상영",
@@ -793,6 +797,7 @@ function renderQuizBridge(m) {
 function renderQuiz(m) {
   const c = m.content;
   const dual = c.mode === "dual_day";
+  const choice = c.mode === "choice";
   setMoogu(c.mooguAsk);
   $main.innerHTML = `
     <section class="block">
@@ -805,11 +810,20 @@ function renderQuiz(m) {
               <span class="sep">–</span>
               <div class="field"><label>토</label><input id="ans2" inputmode="numeric" maxlength="2" placeholder="□□"></div>
             </div>`
-          : `<div class="field"><label>답</label><input id="ans" autocomplete="off" placeholder="여기에 입력"></div>`
+          : choice
+            ? `<div class="btn-row" id="choice-answers" style="margin-top:12px">
+                ${(c.choices || [])
+                  .map(
+                    (opt, i) =>
+                      `<button type="button" class="btn btn--choice" data-choice="${i}">${opt}</button>`
+                  )
+                  .join("")}
+              </div>`
+            : `<div class="field"><label>답</label><input id="ans" autocomplete="off" placeholder="여기에 입력"></div>`
       }
       <p class="feedback" id="fb"></p>
       <div class="btn-row">
-        <button type="button" class="btn btn--primary" id="btn-submit">확인</button>
+        ${choice ? "" : `<button type="button" class="btn btn--primary" id="btn-submit">확인</button>`}
         <button type="button" class="btn btn--ghost" id="btn-hint">힌트</button>
       </div>
     </section>`;
@@ -828,6 +842,30 @@ function renderQuiz(m) {
     state.hintLevel[m.id] = (lvl + 1) % ladder.length;
   };
 
+  const judge = (ok) => {
+    if (ok) {
+      fb.className = "feedback ok";
+      fb.textContent = "맞았어!";
+      showMissionResult(m, true);
+    } else {
+      fb.className = "feedback fail";
+      fb.textContent = c.wrongReaction;
+      setMoogu(c.mooguWrong);
+    }
+  };
+
+  if (choice) {
+    document.querySelectorAll("#choice-answers [data-choice]").forEach((btn) => {
+      btn.onclick = () => {
+        document.querySelectorAll("#choice-answers [data-choice]").forEach((b) => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        const picked = (c.choices || [])[Number(btn.dataset.choice)] || "";
+        judge(acceptText(picked, c.answerAccept));
+      };
+    });
+    return;
+  }
+
   document.getElementById("btn-submit").onclick = () => {
     let ok = false;
     if (dual) {
@@ -839,16 +877,7 @@ function renderQuiz(m) {
     } else {
       ok = acceptText(document.getElementById("ans").value, c.answerAccept);
     }
-
-    if (ok) {
-      fb.className = "feedback ok";
-      fb.textContent = "맞았어!";
-      showMissionResult(m, true);
-    } else {
-      fb.className = "feedback fail";
-      fb.textContent = c.wrongReaction;
-      setMoogu(c.mooguWrong);
-    }
+    judge(ok);
   };
 
   const focusEl = document.getElementById(dual ? "ans1" : "ans");
@@ -868,6 +897,26 @@ function showMissionResult(m, success) {
       </div>
     </section>`;
   document.getElementById("btn-next").onclick = () => completeMission(m);
+}
+
+function formatPhoneNumber_(value) {
+  const digits = String(value || "").replace(/\D/g, "").slice(0, 11);
+  if (!digits) return "";
+
+  // 서울 02
+  if (digits.startsWith("02")) {
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 5) return digits.slice(0, 2) + "-" + digits.slice(2);
+    if (digits.length <= 9) {
+      return digits.slice(0, 2) + "-" + digits.slice(2, digits.length - 4) + "-" + digits.slice(-4);
+    }
+    return digits.slice(0, 2) + "-" + digits.slice(2, 6) + "-" + digits.slice(6, 10);
+  }
+
+  // 휴대폰/지역번호 (0xx)
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 7) return digits.slice(0, 3) + "-" + digits.slice(3);
+  return digits.slice(0, 3) + "-" + digits.slice(3, 7) + "-" + digits.slice(7, 11);
 }
 
 function renderSurvey(m) {
@@ -895,10 +944,19 @@ function renderSurvey(m) {
               </div>`;
             }
             const tag = f.id === "wantFilm" ? "textarea" : "input";
-            const type = f.type === "email" ? 'type="email"' : 'type="text"';
+            const type =
+              f.type === "email"
+                ? 'type="email"'
+                : f.type === "tel"
+                  ? 'type="tel" inputmode="numeric" autocomplete="tel"'
+                  : 'type="text"';
+            const ph =
+              f.id === "phone"
+                ? 'placeholder="010-1234-5678"'
+                : "";
             return `<div class="field">
               <label for="field-${f.id}">${f.label}</label>
-              <${tag} id="field-${f.id}" name="${f.id}" ${type} ${f.required ? "required" : ""}></${tag}>
+              <${tag} id="field-${f.id}" name="${f.id}" ${type} ${ph} ${f.required ? "required" : ""}></${tag}>
             </div>`;
           })
           .join("")}
@@ -908,7 +966,7 @@ function renderSurvey(m) {
           <dl class="privacy-box__dl">
             <div>
               <dt>수집·이용 항목</dt>
-              <dd>이름, 이메일, 사는 곳</dd>
+              <dd>이름, 이메일, 전화번호, 사는 곳</dd>
             </div>
             <div>
               <dt>수집·이용 목적</dt>
@@ -940,6 +998,13 @@ function renderSurvey(m) {
     };
   });
 
+  const phoneEl = document.getElementById("field-phone");
+  if (phoneEl) {
+    phoneEl.addEventListener("input", () => {
+      phoneEl.value = formatPhoneNumber_(phoneEl.value);
+    });
+  }
+
   document.getElementById("survey-form").onsubmit = (e) => {
     e.preventDefault();
     if (state.submitting) return;
@@ -964,6 +1029,25 @@ function renderSurvey(m) {
       }
       data[f.id] = val;
     }
+
+    const email = String(data.email || "").trim();
+    const phone = String(data.phone || "").trim();
+    if (!email && !phone) {
+      const fb = document.getElementById("fb");
+      fb.className = "feedback fail";
+      fb.textContent = "이메일 또는 전화번호 중 하나는 남겨 줘!";
+      return;
+    }
+    if (phone) {
+      const digits = phone.replace(/\D/g, "");
+      if (phone.length < 10 || digits.length < 10) {
+        const fb = document.getElementById("fb");
+        fb.className = "feedback fail";
+        fb.textContent = "전화번호는 숫자 기준 10자 이상 입력해 줘!";
+        return;
+      }
+    }
+
     data.privacyAgree = true;
     // 한국 시간 (클라이언트) — 서버에서도 재확인
     data.submittedAt = new Date().toLocaleString("sv-SE", { timeZone: "Asia/Seoul" });

@@ -128,13 +128,17 @@
 
   <script>
     const ADMIN_PIN = "9410";
-    const AUTH_KEY = "ndff3pre-admin-auth";
     const JUMP_KEY = "ndff3pre-admin-jump";
 
     const $gate = document.getElementById("gate");
     const $panel = document.getElementById("panel");
     const $pin = document.getElementById("pin");
     const $err = document.getElementById("err");
+
+    // 이전에 저장된 관리자 인증은 쓰지 않음 — 들어올 때마다 비밀번호
+    try {
+      sessionStorage.removeItem("ndff3pre-admin-auth");
+    } catch (_) {}
 
     function showPanel() {
       $gate.hidden = true;
@@ -146,16 +150,17 @@
       $gate.hidden = false;
       $pin.value = "";
       $err.textContent = "";
+      setTimeout(() => $pin.focus(), 50);
     }
 
-    if (sessionStorage.getItem(AUTH_KEY) === "1") showPanel();
+    showGate();
 
     document.getElementById("btn-login").onclick = () => {
       if (String($pin.value || "").trim() === ADMIN_PIN) {
-        sessionStorage.setItem(AUTH_KEY, "1");
         showPanel();
       } else {
         $err.textContent = "비밀번호가 틀렸어요.";
+        $pin.focus();
       }
     };
 
@@ -164,8 +169,6 @@
     });
 
     document.getElementById("btn-logout").onclick = () => {
-      sessionStorage.removeItem(AUTH_KEY);
-      sessionStorage.removeItem(JUMP_KEY);
       showGate();
     };
 
