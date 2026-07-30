@@ -560,23 +560,18 @@
     }
 
     .app-foot {
-      position: sticky;
-      bottom: 0;
-      z-index: 150;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 40px calc(12px + env(safe-area-inset-bottom, 0px));
+      position: relative;
+      display: block;
+      padding: 20px 36px;
+      text-align: center;
       font-size: 0.6875rem;
       color: var(--muted);
-      background: rgba(244, 250, 250, 0.96);
-      border-top: 1px solid var(--line);
-      backdrop-filter: blur(8px);
-      text-align: center;
+      background: transparent;
+      border-top: none;
     }
     .app-foot__text {
-      line-height: 1.4;
+      display: inline-block;
+      line-height: 1.5;
       text-align: center;
     }
     .app-foot__admin {
@@ -590,7 +585,7 @@
       font-family: var(--font-ui);
       font-size: 0.5625rem;
       font-weight: 500;
-      opacity: 0.35;
+      opacity: 0.28;
       cursor: pointer;
       padding: 2px 4px;
       text-decoration: none;
@@ -599,7 +594,7 @@
     }
     .app-foot__admin:hover,
     .app-foot__admin:focus {
-      opacity: 0.7;
+      opacity: 0.65;
       color: var(--brand);
     }
 
