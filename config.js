@@ -10,8 +10,29 @@
 window.SURVEY_WEBAPP_URL =
   "https://script.google.com/macros/s/AKfycbxkVIGjYJX-u7Z073zdPu6m-ehVJxd2PUhwX46nUeaKtHREXWCR_w3mR3U7Smd10NsL/exec";
 
-/** 굿즈용 팔로우 링크 (litt.ly) */
-window.FOLLOW_URL = "https://litt.ly/ndff_official";
+/** 굿즈용 SNS 팔로우 링크 (아무거나 하나) */
+window.FOLLOW_LINKS = [
+  {
+    id: "instagram",
+    label: "Instagram",
+    url: "https://www.instagram.com/ndff_official/"
+  },
+  {
+    id: "facebook",
+    label: "Facebook",
+    url: "https://www.facebook.com/share/1DaUhNE8ci/?mibextid=wwXIfr"
+  },
+  {
+    id: "youtube",
+    label: "YouTube",
+    url: "https://youtube.com/@ndff_official?si=onH7CEjHVGrEv2xq"
+  },
+  {
+    id: "tiktok",
+    label: "TikTok",
+    url: "https://www.tiktok.com/@ndff_official?is_from_webapp=1&sender_device=pc"
+  }
+];
 
 /** 에셋 폴더 (보통 수정 불필요) */
 window.ASSET_BASE = "assets/";

@@ -957,7 +957,6 @@ function completeMission(m, fromSurvey) {
 
 function showEnding() {
   const s = state.survey || {};
-  const followUrl = String(window.FOLLOW_URL || "https://litt.ly/ndff_official").trim();
   try {
     localStorage.setItem(
       "ndff3pre-ending",
@@ -986,14 +985,14 @@ function showEnding() {
       <div class="follow-guide">
         <p class="follow-guide__title">굿즈 받는 방법</p>
         <ol class="follow-guide__steps">
-          <li>아래 버튼으로 공식 페이지에 들어가 <strong>아무거나 하나 팔로우</strong>해요.</li>
+          <li>아래 버튼에서 SNS 중 <strong>아무거나 하나 팔로우</strong>해요.</li>
           <li><strong>팔로우한 화면</strong>을 부스 직원에게 보여 주세요.</li>
           <li>확인되면 굿즈를 받을 수 있어요!</li>
         </ol>
         <div class="btn-row" style="margin-top:14px">
-          <a class="btn btn--primary" id="btn-follow" href="${followUrl}" target="_blank" rel="noopener noreferrer">팔로우하러 가기</a>
+          <button type="button" class="btn btn--primary" id="btn-follow">팔로우하러 가기</button>
         </div>
-        <p class="follow-guide__hint">새 탭으로 열려요. 팔로우 화면을 직원에게 보여 준 뒤,<br>이 탭으로 돌아와도 괜찮아요.</p>
+        <p class="follow-guide__hint">SNS를 고른 뒤 팔로우 화면을 직원에게 보여 주세요.</p>
       </div>
 
       <div class="goods-banner">직원에게 팔로우 화면을 보여 주세요</div>
@@ -1009,7 +1008,66 @@ function showEnding() {
     }
   });
   document.getElementById("btn-save-invite").onclick = () => saveInviteCardImage();
+  document.getElementById("btn-follow").onclick = () => openFollowSheet();
   document.getElementById("btn-restart").onclick = resetToTitle;
+}
+
+function getFollowLinks_() {
+  const links = window.FOLLOW_LINKS;
+  if (Array.isArray(links) && links.length) return links;
+  return [
+    { id: "instagram", label: "Instagram", url: "https://www.instagram.com/ndff_official/" },
+    { id: "facebook", label: "Facebook", url: "https://www.facebook.com/share/1DaUhNE8ci/?mibextid=wwXIfr" },
+    { id: "youtube", label: "YouTube", url: "https://youtube.com/@ndff_official?si=onH7CEjHVGrEv2xq" },
+    { id: "tiktok", label: "TikTok", url: "https://www.tiktok.com/@ndff_official?is_from_webapp=1&sender_device=pc" }
+  ];
+}
+
+function snsIconSvg_(id) {
+  if (id === "instagram") {
+    return `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5.2A4.8 4.8 0 1 0 16.8 12 4.8 4.8 0 0 0 12 7.2zm0 7.7A2.9 2.9 0 1 1 14.9 12 2.9 2.9 0 0 1 12 14.9zm5.95-8.85a1.15 1.15 0 1 0 1.15 1.15 1.15 1.15 0 0 0-1.15-1.15z"/></svg>`;
+  }
+  if (id === "facebook") {
+    return `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H7v3h3v7h3v-7h3l1-3h-4v-2c0-.6.4-1 1-1z"/></svg>`;
+  }
+  if (id === "youtube") {
+    return `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23 12.2s0-3.1-.4-4.5c-.2-.9-.9-1.6-1.8-1.8C19.4 5.5 12 5.5 12 5.5s-7.4 0-8.8.4c-.9.2-1.6.9-1.8 1.8C1 9.1 1 12.2 1 12.2s0 3.1.4 4.5c.2.9.9 1.6 1.8 1.8 1.4.4 8.8.4 8.8.4s7.4 0 8.8-.4c.9-.2 1.6-.9 1.8-1.8.4-1.4.4-4.5.4-4.5zM9.8 15.5v-6.6l6.2 3.3-6.2 3.3z"/></svg>`;
+  }
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14.5 3.2c.8 1.4 1.9 2.6 3.3 3.4v2.6a7.4 7.4 0 0 1-3.3-1v6.5a5.5 5.5 0 1 1-4.7-5.4v2.7a2.8 2.8 0 1 0 2 2.7V3.2h2.7z"/></svg>`;
+}
+
+function openFollowSheet() {
+  document.getElementById("follow-sheet")?.remove();
+
+  const links = getFollowLinks_();
+  const overlay = document.createElement("div");
+  overlay.className = "follow-sheet";
+  overlay.id = "follow-sheet";
+  overlay.innerHTML = `
+    <div class="follow-sheet__panel" role="dialog" aria-modal="true" aria-labelledby="follow-sheet-title">
+      <div class="follow-sheet__head">
+        <strong id="follow-sheet-title">SNS 골라 팔로우</strong>
+        <button type="button" class="icon-btn" id="btn-close-follow">닫기</button>
+      </div>
+      <p class="follow-sheet__desc">아래 중 <strong>아무거나 하나</strong> 들어가서 팔로우한 뒤,<br>그 화면을 직원에게 보여 주세요.</p>
+      <div class="follow-sheet__grid">
+        ${links
+          .map(
+            (link) => `
+          <a class="follow-sns follow-sns--${link.id}" href="${link.url}" target="_blank" rel="noopener noreferrer">
+            <span class="follow-sns__icon">${snsIconSvg_(link.id)}</span>
+            <span class="follow-sns__label">${link.label}</span>
+          </a>`
+          )
+          .join("")}
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  overlay.querySelector("#btn-close-follow").onclick = () => overlay.remove();
+  overlay.onclick = (e) => {
+    if (e.target === overlay) overlay.remove();
+  };
 }
 
 function loadHtml2Canvas_(done) {
