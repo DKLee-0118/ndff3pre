@@ -8,7 +8,7 @@
  * 3) GitHub에 다시 올린 뒤 새로고침
  */
 window.SURVEY_WEBAPP_URL =
-  "https://script.google.com/macros/s/AKfycbxkVIGjYJX-u7Z073zdPu6m-ehVJxd2PUhwX46nUeaKtHREXWCR_w3mR3U7Smd10NsL/exec";
+  "https://script.google.com/macros/s/AKfycbxldnyr1_un9nc0MqRpdVdcyLgy_RmkptRYGPJ7zcEbeOlYTNfHtoq0EVneDwhXusbv/exec";
 
 /** 굿즈용 SNS 팔로우 링크 (아무거나 하나) */
 window.FOLLOW_LINKS = [

@@ -926,7 +926,7 @@ function renderSurvey(m) {
     <section class="block">
       <p class="display-sub">${m.title}</p>
       ${voice(m.storyBridge.before)}
-      <form id="survey-form">
+      <form id="survey-form" novalidate>
         ${fields
           .map((f) => {
             if (f.type === "choice") {
@@ -946,14 +946,16 @@ function renderSurvey(m) {
             const tag = f.id === "wantFilm" ? "textarea" : "input";
             const type =
               f.type === "email"
-                ? 'type="email"'
+                ? 'type="text" inputmode="email" autocomplete="email"'
                 : f.type === "tel"
                   ? 'type="tel" inputmode="numeric" autocomplete="tel"'
                   : 'type="text"';
             const ph =
               f.id === "phone"
                 ? 'placeholder="010-1234-5678"'
-                : "";
+                : f.id === "email"
+                  ? 'placeholder="선택 입력 (전화와 둘 중 하나)"'
+                  : "";
             return `<div class="field">
               <label for="field-${f.id}">${f.label}</label>
               <${tag} id="field-${f.id}" name="${f.id}" ${type} ${ph} ${f.required ? "required" : ""}></${tag}>
@@ -1040,7 +1042,7 @@ function renderSurvey(m) {
     }
     if (phone) {
       const digits = phone.replace(/\D/g, "");
-      if (phone.length < 10 || digits.length < 10) {
+      if (digits.length < 10) {
         const fb = document.getElementById("fb");
         fb.className = "feedback fail";
         fb.textContent = "전화번호는 숫자 기준 10자 이상 입력해 줘!";
@@ -1048,6 +1050,8 @@ function renderSurvey(m) {
       }
     }
 
+    data.email = email;
+    data.phone = phone;
     data.privacyAgree = true;
     // 한국 시간 (클라이언트) — 서버에서도 재확인
     data.submittedAt = new Date().toLocaleString("sv-SE", { timeZone: "Asia/Seoul" });
